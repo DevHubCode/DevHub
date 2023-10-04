@@ -1,5 +1,6 @@
 package com.devhub.api.domain.especialidades;
 
+import com.devhub.api.domain.usuario.Usuario;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Especialidades {
+public class Especialidades extends Usuario {
 
     private String especialidade1;
     private String especialidade2;

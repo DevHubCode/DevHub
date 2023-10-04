@@ -4,6 +4,7 @@ import com.devhub.api.domain.especialidades.Especialidades;
 import com.devhub.api.domain.especialidades.EspecialidadesData;
 import com.devhub.api.domain.freelancer.CreateFreelancerData;
 import com.devhub.api.domain.funcao.Funcao;
+import com.devhub.api.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,14 +14,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Freelancer {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String nome;
+public class Freelancer extends Usuario{
     private String cpf;
-    private String telefone;
-    private String email;
-    private Integer contratacoes;
     @Enumerated(EnumType.STRING)
     private Funcao funcao;
     private Double valorHora;
@@ -28,39 +23,16 @@ public class Freelancer {
 //    @Embedded
 //    private Especialidades especialidades;
     private String descricao;
-    private Boolean ativo;
 
 
     public Freelancer(CreateFreelancerData data) {
-        this.ativo = true;
-        this.nome = data.nome();
+        super();
         this.cpf = data.cpf();
-        this.telefone = data.telefone();
-        this.email = data.email();
-        this.contratacoes = 0;
         this.funcao = data.funcao();
         this.valorHora = data.valorHora();
         this.descricao = data.descricao();
         //       TODO: validar associativa entre tecnologia e freelancer
         //        this.especialidades = new Especialidades(data.especialidades());
-    }
-
-    public void atuallizarInformacoes(UpdateFreelancerData data){
-        if(data.nome() != null){
-            this.nome = data.nome();
-        }
-        if (data.telefone() != null){
-            this.telefone = data.telefone();
-        }
-//        if(data.senha() != null){
-//            this.senha = data.senha();
-//        }
-        if (data.descricao() != null){
-            this.descricao = data.descricao();
-        }
-        if(data.valorHora() != null){
-            this.valorHora = data.valorHora();
-        }
     }
 
     public void excluir(){
@@ -70,4 +42,5 @@ public class Freelancer {
     public void ativarConta(){
         this.ativo = true;
     }
+
 }
