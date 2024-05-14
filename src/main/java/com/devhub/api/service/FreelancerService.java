@@ -1,5 +1,10 @@
 package com.devhub.api.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectTagging;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.Tag;
 import com.devhub.api.domain.avaliacao_freelancer.AvaliacaoFreelancerRepository;
 import com.devhub.api.domain.contratante.ContratanteRepository;
 import com.devhub.api.domain.contratante.dto.ContratanteValidacaoDTO;
@@ -12,6 +17,7 @@ import com.devhub.api.domain.usuario.UserRole;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,9 +26,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +46,13 @@ public class FreelancerService {
     private ContratanteRepository contratanteRepository;
     @Autowired
     private AvaliacaoFreelancerRepository avaliacaoRepo;
+
+    @Value("${bucketName}")
+    private String bucketName;
+    private final AmazonS3 s3;
+    public FreelancerService(AmazonS3 s3) {
+        this.s3 = s3;
+    }
 
     @Transactional
     public Freelancer cadastrarFreelancer(CreateFreelancerDTO data) {
@@ -147,13 +164,60 @@ public class FreelancerService {
         return especialidades;
     }
 
-    public Integer atualizarFoto(MultipartFile novaFoto, Integer idFreelancer) throws IOException {
+    public Integer atualizarFoto(MultipartFile novaFoto, Long idFreelancer) throws IOException {
         byte[] novaFotoByte = novaFoto.getBytes();
         int atualizados = repository.atualizarFoto(novaFotoByte, idFreelancer);
 
+        ObjectTagging tagging = new ObjectTagging(Arrays.asList(new Tag("environment", "public")));
+        Freelancer freelancer = repository.getReferenceById(idFreelancer);
+        if (freelancer == null) {
+            throw new EntityNotFoundException();
+        }
+
+        savePhotoInS3(freelancer, novaFoto, tagging);
         int status = atualizados == 1 ? 200 : 404;
 
         return status;
+    }
+
+    private void savePhotoInS3(Freelancer freelancer, MultipartFile photo, ObjectTagging tagging) {
+        String fileName = generateFileName(freelancer.getNome());
+        String fullPath = "freelancers/images/" + freelancer.getId() + "_" + freelancer.getNome() + "/" + fileName;
+        try {
+            uploadFile(fullPath, photo, tagging);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String uploadFile(String fullPath, MultipartFile photo, ObjectTagging tagging) {
+        int count = 0;
+        int maxTries = 3;
+        while (true) {
+            try {
+                File multiPartFile = convertMultPartToFile(photo);
+                PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fullPath, multiPartFile)
+                        .withTagging(tagging);
+                PutObjectResult putObjectResult = s3.putObject(putObjectRequest);
+                return putObjectResult.getContentMd5();
+            } catch (IOException e) {
+                if (++count == maxTries) throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private File convertMultPartToFile(MultipartFile file) throws IOException {
+        File convertFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
+        FileOutputStream fos = new FileOutputStream(convertFile);
+        fos.write(file.getBytes());
+        fos.close();
+        return convertFile;
+    }
+
+    private String generateFileName(String nome) {
+        if (nome != null) nome = nome.replaceAll("\\s+", "");
+        if (nome.isBlank()) nome = "desconhecido";
+        return nome + "_profile-photo.webp";
     }
 
     public List<PerfilFreelancerDTO> getFreelancersBySearch(String pesquisa) {

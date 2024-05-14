@@ -29,7 +29,7 @@ public interface ContratanteRepository extends JpaRepository<Contratante, Long> 
         update Contratante c set c.imagem = ?1
         where c.id = ?2     
             """)
-    int atualizarFoto(byte[] foto, int idFreelancer);
+    int atualizarFoto(byte[] foto, Long idFreelancer);
 
     @Query("""
     select c.imagem from Contratante c where c.id = ?1
