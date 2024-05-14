@@ -148,7 +148,7 @@ public class FreelancerController {
     }
 
     @PatchMapping(value = "/foto/{codigo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> patchFoto(@PathVariable int codigo,
+    public ResponseEntity<Void> patchFoto(@PathVariable Long codigo,
                                           @RequestPart("image") MultipartFile novaFoto) throws IOException {
         return ResponseEntity.status(service.atualizarFoto(novaFoto, codigo)).build();
     }

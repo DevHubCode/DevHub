@@ -33,7 +33,7 @@ public interface FreelancerRepository extends JpaRepository<Freelancer, Long> {
         update Freelancer f set f.imagem = ?1
         where f.id = ?2
             """)
-    int atualizarFoto(byte[] foto, int idFreelancer);
+    int atualizarFoto(byte[] foto, Long idFreelancer);
 
     @Query("""
     select
