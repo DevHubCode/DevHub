@@ -1,0 +1,6 @@
+2024-04-08 19:40:59 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "FREELANCER" not found (this database is empty); SQL statement:
+select f1_0.email,f1_0.cpf,f1_0.telefone from freelancer f1_0 [42104-214]
+2024-04-08 19:45:47 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "FREELANCER" not found (this database is empty); SQL statement:
+select f1_0.email,f1_0.cpf,f1_0.telefone from freelancer f1_0 [42104-214]
