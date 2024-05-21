@@ -135,7 +135,7 @@ public class FreelancerService {
     public Freelancer atualizar(UpdateFreelancerDTO data, Long id) {
         var freelancer = repository.getReferenceById(id);
         if (freelancer == null) {
-            throw new EntityNotFoundException();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         freelancer.atuallizarInformacoes(data);
         return freelancer;
@@ -145,7 +145,7 @@ public class FreelancerService {
     public void excluir(Long id) {
         var freelancer = repository.getReferenceById(id);
         if (freelancer == null) {
-            throw new EntityNotFoundException();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         freelancer.excluir();
     }
