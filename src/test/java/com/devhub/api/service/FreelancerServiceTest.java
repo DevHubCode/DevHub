@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = com.devhub.api.Application.class)
+@SpringBootTest(classes = com.devhub.api.Application.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("test")
 @ComponentScan(basePackages = "com.devhub.api")
 public class FreelancerServiceTest {
