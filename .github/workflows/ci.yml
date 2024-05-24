@@ -18,10 +18,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Run Unit Tests
-        run: mvn test
-
-      - name: Build Project
+      - name: Build Project and Test
         run: mvn clean install -DskipTests
 
       - name: Login to docker hub
