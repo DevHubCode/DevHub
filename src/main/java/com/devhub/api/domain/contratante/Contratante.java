@@ -7,6 +7,7 @@ import com.devhub.api.domain.usuario.UserRole;
 import com.devhub.api.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
@@ -31,8 +32,11 @@ public class Contratante extends Usuario {
         if (data.telefone() != null) {
             this.telefone = data.telefone();
         }
+        if(data.email() != null){
+            this.email = data.email();
+        }
         if(data.senha() != null){
-            this.senha = data.senha();
+            this.senha = new BCryptPasswordEncoder().encode(data.senha());;
         }
 
     }

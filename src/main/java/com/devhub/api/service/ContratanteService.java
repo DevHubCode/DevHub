@@ -129,7 +129,14 @@ public class ContratanteService {
         if (contratante == null) {
             throw new EntityNotFoundException();
         }
+
+        if(data.senha() != null) {
+            String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
+            contratante.setSenha(encryptedPassword);
+        }
+
         contratante.atuallizarInformacoes(data);
+
         return contratante;
     }
 
