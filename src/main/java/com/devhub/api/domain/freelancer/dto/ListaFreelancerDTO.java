@@ -18,11 +18,13 @@ public record ListaFreelancerDTO (
         List<Especialidade> especialidades,
         String senioridade,
         Double valorHora,
-        Double nota
+        Double nota,
+        String descricao,
+        String telefone
 ){
     public ListaFreelancerDTO(Freelancer freelancer, Double nota) {
         this(freelancer.getId(), freelancer.getNome(), freelancer.getImagem(),
                 freelancer.getFuncao(),freelancer.getEspecialidades(), freelancer.getSenioridade(), freelancer.getValorHora(),
-                nota);
+                nota, freelancer.getDescricao(),freelancer.getTelefone());
     }
 }

@@ -50,13 +50,14 @@ public class FreelancerService {
     @Value("${bucketName}")
     private String bucketName;
     private final AmazonS3 s3;
+
     public FreelancerService(AmazonS3 s3) {
         this.s3 = s3;
     }
 
     @Transactional
     public Freelancer cadastrarFreelancer(CreateFreelancerDTO data) {
-        
+
         List<FreelancerValidacaoDTO> dadosFreelancer = repository.validarDadosUnicos();
         List<ContratanteValidacaoDTO> dadosContratante = contratanteRepository.validarDadosUnicos();
 
@@ -81,7 +82,7 @@ public class FreelancerService {
     protected String validarCamposCadastrados(List<Object> contasCadastradas, CreateFreelancerDTO data) {
         String camposJaCadastrados = "Dados já cadastrados: ";
         List<String> listaCampos = new ArrayList<>();
-        for (Object conta: contasCadastradas) {
+        for (Object conta : contasCadastradas) {
             if (conta instanceof FreelancerValidacaoDTO f) {
                 if (f.getEmail().equalsIgnoreCase(data.email())) {
                     listaCampos.add("E-mail");
@@ -108,10 +109,17 @@ public class FreelancerService {
     public List<ListaFreelancerDTO> getFreelancers() {
         List<Freelancer> freelancers = repository.findAllByAtivoTrue();
         List<ListaFreelancerDTO> dtos = freelancers.stream().map(f ->
-                     new ListaFreelancerDTO(
-                                f.getId(), f.getNome(), f.getImagem(), f.getFuncao(), f.getEspecialidades(),
-                                f.getSenioridade(), f.getValorHora(),
-                                avaliacaoRepo.calcularMediaNotas(f)
+                new ListaFreelancerDTO(
+                        f.getId(),
+                        f.getNome(),
+                        f.getImagem(),
+                        f.getFuncao(),
+                        f.getEspecialidades(),
+                        f.getSenioridade(),
+                        f.getValorHora(),
+                        avaliacaoRepo.calcularMediaNotas(f),
+                        f.getDescricao(),
+                        f.getTelefone()
                 )).toList();
         return dtos;
     }
@@ -221,15 +229,15 @@ public class FreelancerService {
     }
 
     public List<PerfilFreelancerDTO> getFreelancersBySearch(String pesquisa) {
-         List<Freelancer> freelancers = repository.getFreelancersBySearch(pesquisa);
-         List<PerfilFreelancerDTO> dtos = freelancers.stream()
-                 .map(f -> new PerfilFreelancerDTO(
-                         f.getId(), f.getNome(), f.getEmail(), f.getFuncao(),
-                         f.getEspecialidades(), f.getValorHora(),
-                         f.getSenioridade(), f.getDescricao(), f.getTelefone(),
-                         f.getImagem(), avaliacaoRepo.calcularMediaNotas(f)
-                 )).toList();
-         return dtos;
+        List<Freelancer> freelancers = repository.getFreelancersBySearch(pesquisa);
+        List<PerfilFreelancerDTO> dtos = freelancers.stream()
+                .map(f -> new PerfilFreelancerDTO(
+                        f.getId(), f.getNome(), f.getEmail(), f.getFuncao(),
+                        f.getEspecialidades(), f.getValorHora(),
+                        f.getSenioridade(), f.getDescricao(), f.getTelefone(),
+                        f.getImagem(), avaliacaoRepo.calcularMediaNotas(f)
+                )).toList();
+        return dtos;
     }
 
     public List<PerfilFreelancerDTO> compareFreelancers(List<EspecialidadeDTO> filters, Long compareTo) {
